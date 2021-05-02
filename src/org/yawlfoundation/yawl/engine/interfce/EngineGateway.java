@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2004-2012 The YAWL Foundation. All rights reserved.
+ * Copyright (c) 2004-2020 The YAWL Foundation. All rights reserved.
  * The YAWL Foundation is a collaboration of individuals and
  * organisations who are committed to improving workflow technology.
  *
@@ -241,4 +241,13 @@ public interface EngineGateway extends Remote {
     String isHibernateStatisticsEnabled(String sessionHandle);
 
     String getHibernateStatistics(String sessionHandle);
+
+    String reannounceEnabledWorkItems(String sessionHandle);
+
+    String reannounceExecutingWorkItems(String sessionHandle);
+
+    String reannounceFiredWorkItems(String sessionHandle);
+
+    String reannounceWorkItem(String itemID, String sessionHandle);
+
 }

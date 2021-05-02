@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2004-2012 The YAWL Foundation. All rights reserved.
+ * Copyright (c) 2004-2020 The YAWL Foundation. All rights reserved.
  * The YAWL Foundation is a collaboration of individuals and
  * organisations who are committed to improving workflow technology.
  *
@@ -314,7 +314,7 @@ public class YPersistenceManager {
             } else {
                 getSession().save(obj);
             }
-            getSession().flush();
+   //         getSession().flush();
         } catch (Exception e) {
             logger.error("Failure detected whilst persisting instance of " +
                     obj.getClass().getName(), e);
@@ -327,11 +327,11 @@ public class YPersistenceManager {
                     obj.getClass().getName(), e);
         }
 
-        try {
-            getSession().evict(obj);
-        } catch (HibernateException e) {
-            logger.warn("Failure whilst evicting object from Hibernate session cache", e);
-        }
+//        try {
+//            getSession().evict(obj);
+//        } catch (HibernateException e) {
+//            logger.warn("Failure whilst evicting object from Hibernate session cache", e);
+//        }
         logger.debug("<-- doPersistAction");
     }
 

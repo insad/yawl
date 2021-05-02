@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2004-2012 The YAWL Foundation. All rights reserved.
+ * Copyright (c) 2004-2020 The YAWL Foundation. All rights reserved.
  * The YAWL Foundation is a collaboration of individuals and
  * organisations who are committed to improving workflow technology.
  *
@@ -32,7 +32,7 @@ import javax.mail.Message;
 import java.io.IOException;
 
 /**
- * A simple service that provides for status updates to the YAWL Twitter account
+ * A service that provides for emails to be sent by tasks
  *
  * @author Michael Adams
  * @date 25/07/2009
@@ -204,11 +204,8 @@ public class MailService extends InterfaceBWebsideController {
     private void addRecipients(Email email, String name, String address,
                               Message.RecipientType mailType) {
         if (! StringUtil.isNullOrEmpty(address)) {
-            String[] addresses = address.split(";");
-            if (name == null || addresses.length > 1) name = "";
-            for (int i = 0; i < addresses.length; i++) {
-                email.addRecipient(name, addresses[i], mailType);
-            }
+            if (name == null) name = "";
+            email.addRecipients(name, mailType, address);
         }
     }
 

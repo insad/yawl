@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2004-2012 The YAWL Foundation. All rights reserved.
+ * Copyright (c) 2004-2020 The YAWL Foundation. All rights reserved.
  * The YAWL Foundation is a collaboration of individuals and
  * organisations who are committed to improving workflow technology.
  *
@@ -70,8 +70,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 /**
  * The ResourceManager singleton manages all aspects of the resource perspective,
@@ -375,7 +375,7 @@ public final class ResourceManager extends InterfaceBWebsideController {
 
     public void handleCancelledCaseEvent(String caseID) {
         if (_serviceEnabled) {
-            synchronized (_ibEventMutex) {
+  //          synchronized (_ibEventMutex) {
                 removeCaseFromAllQueues(caseID);                          // workqueues
                 _cache.removeCaseFromTaskCompleters(caseID);
                 _cache.cancelCodeletRunnersForCase(caseID);
@@ -384,7 +384,7 @@ public final class ResourceManager extends InterfaceBWebsideController {
                 removeChain(caseID);
                 removeActiveCalendarEntriesForCase(caseID);
                 _services.removeCaseFromDocStore(caseID);
-            }
+  //          }
         }
     }
 
@@ -410,11 +410,12 @@ public final class ResourceManager extends InterfaceBWebsideController {
     // by services other than this one
     public void handleWorkItemStatusChangeEvent(WorkItemRecord wir,
                                                 String oldStatus, String newStatus) {
-        synchronized (_ibEventMutex) {
-            WorkItemRecord cachedWir = _workItemCache.get(wir.getID());
+        WorkItemRecord cachedWir = _workItemCache.get(wir.getID());
 
-            // if its a status change this service didn't cause
-            if (!(cachedWir == null || newStatus.equals(cachedWir.getStatus()))) {
+        // if its a status change this service didn't cause
+        if (!(cachedWir == null || newStatus.equals(cachedWir.getStatus()))) {
+
+            synchronized (_ibEventMutex) {
 
                 // if it has been 'finished', remove it from all queues
                 if ((newStatus.equals(WorkItemRecord.statusComplete)) ||
@@ -1032,6 +1033,13 @@ public final class ResourceManager extends InterfaceBWebsideController {
     }
 
 
+    protected boolean unsetDeferredChoiceHandled(WorkItemRecord wir) {
+        return wir.isDeferredChoiceGroupMember() &&
+                _cache.unsetDeferredGroupHandled(wir.getRootCaseID(),
+                        wir.getDeferredChoiceGroupID());
+        } 
+
+
     protected boolean isDeferredChoiceHandled(WorkItemRecord wir) {
         return wir.isDeferredChoiceGroupMember() &&
                 _cache.isDeferredGroupHandled(wir.getRootCaseID(),
@@ -1324,6 +1332,8 @@ public final class ResourceManager extends InterfaceBWebsideController {
         boolean success = false;
         if (hasUserTaskPrivilege(p, wir, TaskPrivileges.CAN_DEALLOCATE)) {
             p.getWorkQueues().removeFromQueue(wir, WorkQueue.ALLOCATED);
+
+            if (wir.isDeferredChoiceGroupMember()) unsetDeferredChoiceHandled(wir);
 
             ResourceMap rMap = getResourceMap(wir);
             if (rMap != null) {

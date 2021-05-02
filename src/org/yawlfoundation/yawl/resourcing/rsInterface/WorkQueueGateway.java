@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2004-2012 The YAWL Foundation. All rights reserved.
+ * Copyright (c) 2004-2020 The YAWL Foundation. All rights reserved.
  * The YAWL Foundation is a collaboration of individuals and
  * organisations who are committed to improving workflow technology.
  *
@@ -18,6 +18,7 @@
 
 package org.yawlfoundation.yawl.resourcing.rsInterface;
 
+import org.yawlfoundation.yawl.authentication.YExternalClient;
 import org.yawlfoundation.yawl.elements.YAWLServiceReference;
 import org.yawlfoundation.yawl.engine.YSpecificationID;
 import org.yawlfoundation.yawl.engine.interfce.Marshaller;
@@ -357,6 +358,14 @@ public class WorkQueueGateway extends HttpServlet {
                 ysr.set_assignable(assignable.equals("true"));
             }
             result = response(_rm.addRegisteredService(ysr));
+        } else if (action.equals("addExternalClient")) {
+            String name = req.getParameter("name");
+            String pw = req.getParameter("password");
+            String doco = req.getParameter("doco");
+            result = response(_rm.addExternalClient(new YExternalClient(name, pw, doco)));
+        } else if (action.equals("removeExternalClient")) {
+            String id = req.getParameter("name");
+            result = response(_rm.removeExternalClient(id));
         }
 
         return result;
